@@ -5,7 +5,7 @@ import { JSDOM } from 'jsdom';
 import * as React from 'react';
 import { act } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ChatContactForm } from '../chat/react.mjs';
+import { ChatContactForm } from '../chat/contact-react.mjs';
 
 test('React wrapper retains the same draft DOM and pending send while callbacks change; cleanup rejects late updates', async t => {
   const dom = new JSDOM('<div id="host"></div>');

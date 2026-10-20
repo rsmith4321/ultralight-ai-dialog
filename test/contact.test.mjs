@@ -154,8 +154,12 @@ test('optional contact styles install once, preserve 16px inputs and 44px target
   assert.equal(f.doc.querySelectorAll('[data-shared-chat-contact-style]').length, 1);
   assert.equal(f.dom.window.getComputedStyle(f.ui.element.elements.name).fontSize, '16px');
   assert.equal(f.dom.window.getComputedStyle(f.send).minHeight, '44px');
-  const hook = await build({ stdin: { contents: "export { default } from './chat/react.mjs';", resolveDir: process.cwd() }, bundle: true, format: 'esm', minify: true, write: false, external: ['react'] });
-  assert.doesNotMatch(hook.outputFiles[0].text, /data-chat-contact/, 'unused optional React contact is tree-shaken from the viewport hook');
+  const hook = await build({ stdin: { contents: "export { default } from './chat/react.mjs';", resolveDir: process.cwd() }, bundle: true, format: 'esm', minify: true, write: false, metafile: true, external: ['react'] });
+  assert.doesNotMatch(hook.outputFiles[0].text, /data-chat-contact/, 'viewport-only hook excludes contact UI');
+  assert.equal(Object.keys(hook.metafile.inputs).some(name => name.endsWith('contact.mjs') || name.endsWith('contact-react.mjs')), false, 'viewport hook module graph has no contact edges');
+  const contactReact = await build({ entryPoints: ['chat/contact-react.mjs'], bundle: true, format: 'esm', write: false, metafile: true, external: ['react'] });
+  assert.equal(Object.keys(contactReact.metafile.inputs).some(name => name.endsWith('viewport.mjs') || name.endsWith('panel.mjs')), false, 'contact wrapper has no viewport or dialog edges');
+  assert.ok(Object.keys(contactReact.metafile.inputs).some(name => name.endsWith('contact.mjs')));
   for (const entry of ['launcher','panel','contact']) {
     const result = await build({ entryPoints: [`chat/${entry}.mjs`], bundle: true, format: 'esm', write: false, metafile: true });
     assert.equal(Object.keys(result.metafile.inputs).some(name => name.includes('node_modules')), false, 'vanilla graph has no external runtime');

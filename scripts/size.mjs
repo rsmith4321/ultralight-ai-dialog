@@ -10,6 +10,10 @@ for (const name of ['launcher', 'panel', 'contact']) {
 result.vanillaTotal = Object.fromEntries(['raw','gzip','brotli'].map(key => [key, result.launcher[key] + result.panel[key]]));
 result.optionalContact = result.contact;
 delete result.contact;
+for (const [key, name] of [['optionalReactViewport', 'react'], ['optionalReactContact', 'contact-react']]) {
+  const built = await build({ entryPoints: [`chat/${name}.mjs`], bundle: true, minify: true, write: false, format: 'esm', target: ['safari15'], legalComments: 'none', external: ['react'] });
+  result[key] = measure(built.outputFiles[0].contents);
+}
 result.optionalModalCss = measure(fs.readFileSync('chat/modal.css'));
 result.version = JSON.parse(fs.readFileSync('package.json')).version;
 if (result.launcher.gzip > 2048 || result.panel.gzip > 8192 || result.vanillaTotal.gzip > 10240) throw new Error('Dialog exceeds the documented lightweight budget');

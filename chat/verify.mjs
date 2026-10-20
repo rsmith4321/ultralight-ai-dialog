@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-export const CHAT_FILES = ['LICENSE', 'README.md', 'launcher.mjs', 'panel.mjs', 'styles.mjs', 'viewport.mjs', 'modal.css', 'react.mjs', 'contact.mjs', 'package.json', 'verify.mjs'];
+export const CHAT_FILES = ['LICENSE', 'README.md', 'launcher.mjs', 'panel.mjs', 'styles.mjs', 'viewport.mjs', 'modal.css', 'react.mjs', 'contact.mjs', 'contact-react.mjs', 'package.json', 'verify.mjs'];
 export const CHAT_RECEIPT = 'SOURCE.json';
 const hash = bytes => crypto.createHash('sha256').update(bytes).digest('hex');
 export function chatHashes(directory) {

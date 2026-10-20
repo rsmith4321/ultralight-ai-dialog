@@ -1,6 +1,6 @@
 # Ultralight AI Dialog runtime
 
-Version 0.1.7. MIT licensed. Canonical source and integration documentation:
+Version 0.1.8. MIT licensed. Canonical source and integration documentation:
 https://github.com/rsmith4321/ultralight-ai-dialog
 
 Presentation and viewport behavior only. No provider, network, authentication,
@@ -28,4 +28,6 @@ definite ok:false stays editable unless locked:true/uncertain:true. Pending,
 success and uncertain statuses always lock, while Back remains available. Keep mounted while hidden to retain drafts
 and pending receipts. No auto focus, transport, retry or transcript sharing.
 Extra verification DOM stays adapter-owned and is never serialized.
-react.mjs additionally exports ChatContactForm with live callback refs.
+contact-react.mjs exports ChatContactForm with live callback refs.
+react.mjs exports only the viewport hook and never imports the contact UI.
+Version0.1.7 named ChatContactForm imports must migrate to contact-react.mjs.

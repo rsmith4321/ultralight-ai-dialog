@@ -7,22 +7,32 @@
   "panel": {
     "raw": 11328,
     "gzip": 3579,
-    "brotli": 3129
+    "brotli": 3128
   },
   "vanillaTotal": {
     "raw": 13846,
     "gzip": 4775,
-    "brotli": 4085
+    "brotli": 4084
   },
   "optionalContact": {
     "raw": 6213,
     "gzip": 2426,
     "brotli": 2065
   },
+  "optionalReactViewport": {
+    "raw": 1236,
+    "gzip": 527,
+    "brotli": 438
+  },
+  "optionalReactContact": {
+    "raw": 7265,
+    "gzip": 2756,
+    "brotli": 2365
+  },
   "optionalModalCss": {
     "raw": 4454,
     "gzip": 1167,
     "brotli": 982
   },
-  "version": "0.1.7"
+  "version": "0.1.8"
 }

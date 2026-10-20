@@ -4,13 +4,13 @@ A small, provider-neutral conversation UI for websites. An on-demand launcher op
 
 The vanilla modules have no external runtime dependencies. They handle presentation, viewport sizing, and dialog behavior; your application owns requests, authentication, history, and business rules.
 
-Version 0.1.7 measures **4,775 bytes gzip** for the vanilla launcher and panel combined. The initial launcher is **1,196 bytes gzip**; the panel loads when opened.
+Version 0.1.8 measures **4,775 bytes gzip** for the vanilla launcher and panel combined. The initial launcher is **1,196 bytes gzip**; the panel loads when opened.
 
 | Bundle | Minified bytes | Gzip bytes | Brotli bytes |
 | --- | ---: | ---: | ---: |
 | Launcher | 2,518 | 1,196 | 956 |
-| Panel, styles, and viewport behavior | 11,328 | 3,579 | 3,129 |
-| Combined | 13,846 | 4,775 | 4,085 |
+| Panel, styles, and viewport behavior | 11,328 | 3,579 | 3,128 |
+| Combined | 13,846 | 4,775 | 4,084 |
 
 Measured with esbuild 0.28.1, ESM minification targeting Safari 15, and Node's default gzip and Brotli settings. The total sums separately compressed bundles. These figures exclude application content, the demo, React, the optional contact form, and the optional React modal stylesheet. Reproduce them with `npm run size`.
 
@@ -123,10 +123,10 @@ Only deliberate activation of **Send message** submits. Enter in a single-line f
 
 Back stays available during a pending send. Keep the form mounted and use `contact.element.hidden` when switching to the conversation so a pending result can update its own receipt without reopening anything, moving focus, or navigating. `destroy()` is idempotent; it does not cancel your adapter's transport. Your adapter remains responsible for server-side limits, validation, rate limiting, bot verification, and the meaning of its receipt.
 
-The optional React adapter exports `ChatContactForm` alongside the existing viewport hook:
+The optional `contact-react.mjs` entry exports `ChatContactForm` separately from the existing viewport hook (package export `ultralight-ai-dialog/contact-react`):
 
 ```jsx
-import { ChatContactForm } from './shared/chat/react.mjs';
+import { ChatContactForm } from './shared/chat/contact-react.mjs';
 
 <ChatContactForm
   ref={contactRef} // exposes getValues(), getStatus(), setStatus(), focus()
@@ -186,3 +186,7 @@ Wide phone windows below 1024px wide and below 500px high now retain full takeov
 ## 0.1.7
 
 Adds an optional contact form for explicit visitor-authored messages, safe receipts, pending-send protection, and Back navigation. Includes a React wrapper around the same UI. Applications retain their existing transport and verification. The contact module is measured separately and adds no code to the launcher or dialog core.
+
+## 0.1.8
+
+The optional React contact wrapper now lives in `contact-react.mjs`; import `ChatContactForm` from that entry instead of `react.mjs`. The existing `react.mjs` viewport hook has no contact-module imports or re-exports, keeping contact code out of viewport-only chunks. `createContactForm` and all contact behavior are unchanged. The size command reports both optional React adapters separately, excluding the external React runtime. The viewport adapter measures 527 bytes gzip (1,236 minified bytes); the contact React adapter including the vanilla form measures 2,756 bytes gzip (7,265 minified bytes).

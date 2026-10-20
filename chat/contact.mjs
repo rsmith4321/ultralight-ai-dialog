@@ -20,7 +20,7 @@ export function createContactForm({ document: doc = globalThis.document, onSubmi
   if (typeof onSubmit !== 'function') throw new TypeError('Contact form requires an onSubmit callback.');
   if (!doc.querySelector('style[data-shared-chat-contact-style]')) {
     const style = doc.createElement('style');
-    style.dataset.sharedChatContactStyle = '0.1.7';
+    style.dataset.sharedChatContactStyle = '0.1.8';
     style.textContent = contactCss;
     doc.head.append(style);
   }
