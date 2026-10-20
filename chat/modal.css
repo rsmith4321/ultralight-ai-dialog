@@ -1,0 +1,82 @@
+/* Chat alone uses the visible viewport while its existing modal owns focus. */
+[data-shared-chat][data-shared-chat] {
+  --sc-chat-top: max(8px, env(safe-area-inset-top, 0px));
+  --sc-chat-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+  --sc-chat-left: max(8px, env(safe-area-inset-left, 0px));
+  --sc-chat-right: max(8px, env(safe-area-inset-right, 0px));
+  box-sizing: border-box;
+  position: fixed;
+  top: auto;
+  right: auto;
+  bottom: calc(var(--chat-vbottom, 0px) + var(--sc-chat-bottom));
+  left: calc(var(--chat-vleft, 0px) + var(--chat-vw, 100vw) - min(var(--sc-chat-width, 420px), calc(var(--chat-vw, 100vw) - var(--sc-chat-left) - var(--sc-chat-right))) - var(--sc-chat-right));
+  margin: 0;
+  width: min(var(--sc-chat-width, 420px), calc(var(--chat-vw, 100vw) - var(--sc-chat-left) - var(--sc-chat-right)));
+  max-width: calc(var(--chat-vw, 100vw) - var(--sc-chat-left) - var(--sc-chat-right));
+  border-radius: var(--ui-radius-dialog, 12px);
+  height: auto;
+  max-height: min(720px, max(0px, calc(var(--chat-vh, 100dvh) - var(--sc-chat-top) - var(--sc-chat-bottom))));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+[data-shared-chat][data-shared-chat].sc-bd > .sc-bd__body {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+[data-shared-chat] .sc-bd-assistant { display: flex; flex-direction: column; flex: 1; min-height: 0; gap: 16px; }
+[data-shared-chat] .sc-bd-assistant__log { flex: 1; min-height: 0; max-height: none; overflow: auto; }
+[data-shared-chat] .sc-bd-assistant__composer { flex-shrink: 0; }
+[data-shared-chat] .sc-bd-assistant__input { font-size: 16px; min-height: 44px; max-height: 96px; resize: none; }
+@media (max-width: 600px) {
+  [data-shared-chat][data-shared-chat] {
+    top: auto;
+    left: calc(var(--chat-vleft, 0px) + var(--sc-chat-left));
+    right: auto;
+  }
+}
+
+[data-shared-chat][data-shared-chat] > :is(div, section):last-child { min-height: 0; max-height: inherit; height: auto; flex-shrink: 1; }
+[data-shared-chat] [data-chat-scroll] { min-height: 0; overflow: auto; overscroll-behavior: contain; }
+@media (prefers-reduced-motion: reduce) { [data-shared-chat][data-shared-chat] { animation: none; transition: none; } }
+
+[data-shared-chat][data-shared-chat][hidden] { display: none; }
+[data-chat-load-error] { position: fixed; right: max(12px, env(safe-area-inset-right)); bottom: max(80px, calc(env(safe-area-inset-bottom) + 68px)); z-index: 1201; max-width: min(320px, calc(100vw - 24px)); margin: 0; padding: 12px; border: 1px solid var(--ui-hairline, #88939b); border-radius: 12px; background: var(--ui-paper, #fff); color: var(--ui-text, #25343a); font: 14px/1.4 system-ui; }
+
+[data-shared-chat][data-shared-chat].sc-bd > :is(.sc-bd__title, .sc-bd__actions) { flex-shrink: 0; }
+[data-shared-chat][data-shared-chat].sc-bd > .sc-bd__title { padding: 10px 14px; }
+[data-shared-chat][data-shared-chat].sc-bd > .sc-bd__actions { padding: 8px 14px; }
+[data-shared-chat][data-shared-chat].sc-bd > .sc-bd__body { padding: 12px 14px; }
+[data-shared-chat] .sc-bd-btn { min-height: 44px; }
+
+/* Setup needs room for editable proposals. Other chats remain compact. */
+@media (min-width: 600px) and (max-width: 1399.95px) {
+  [data-shared-chat][data-chat-layout="setup"] {
+    --sc-chat-top: max(24px, env(safe-area-inset-top, 0px));
+    --sc-chat-bottom: max(24px, env(safe-area-inset-bottom, 0px));
+    --sc-chat-left: max(24px, env(safe-area-inset-left, 0px));
+    --sc-chat-right: max(24px, env(safe-area-inset-right, 0px));
+    width: min(960px, calc(var(--chat-vw, 100vw) - var(--sc-chat-left) - var(--sc-chat-right)));
+    left: calc(var(--chat-vleft, 0px) + (var(--chat-vw, 100vw) - min(960px, calc(var(--chat-vw, 100vw) - var(--sc-chat-left) - var(--sc-chat-right)))) / 2);
+    height: max(0px, calc(var(--chat-vh, 100dvh) - var(--sc-chat-top) - var(--sc-chat-bottom)));
+    max-height: none;
+  }
+}
+@media (max-width: 599.95px), (max-width: 899.95px) and (max-height: 499.95px) {
+  [data-shared-chat][data-chat-layout="setup"] {
+    left: var(--chat-vleft, 0px);
+    bottom: var(--chat-vbottom, 0px);
+    width: var(--chat-vw, 100vw);
+    max-width: none;
+    height: var(--chat-vh, 100dvh);
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "name": "ultralight-ai-dialog",
+  "version": "0.1.5",
+  "description": "A tiny, provider-neutral assistant dialog with phone takeover, viewport-aware composition and optional React integration.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rsmith4321/ultralight-ai-dialog.git"
+  },
+  "author": "Ryan Smith",
+  "files": [
+    "chat",
+    "LICENSE",
+    "README.md"
+  ],
+  "exports": {
+    ".": "./chat/panel.mjs",
+    "./launcher": "./chat/launcher.mjs",
+    "./panel": "./chat/panel.mjs",
+    "./viewport": "./chat/viewport.mjs",
+    "./react": "./chat/react.mjs",
+    "./modal.css": "./chat/modal.css"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "size": "node scripts/size.mjs",
+    "demo": "python3 -m http.server 4173 --bind 127.0.0.1"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "esbuild": "0.28.1",
+    "jsdom": "26.1.0"
+  }
+}

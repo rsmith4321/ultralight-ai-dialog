@@ -1,0 +1,7 @@
+{
+  "name": "ultralight-ai-dialog",
+  "version": "0.1.5",
+  "private": true,
+  "type": "module",
+  "license": "MIT"
+}

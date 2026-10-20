@@ -1,0 +1,15 @@
+{
+  "source": "MarketingKit/chat",
+  "commit": "62ab190056cbe69f942ceb8fcd4d11adc04e480d",
+  "files": {
+    "README.md": "c54424a3e5fee892b08c94cda54d01e33ea418408c434fb4a0e702554b7ce77d",
+    "launcher.mjs": "0c030c97eaf42f366ba84871a0aef375907181dc23974d8971c9f6d4f2afdf48",
+    "modal.css": "e966200b954636b2563969798353fd5ff802425420d90153aa7dbc82194cc391",
+    "package.json": "05bf326342205d8580a8741dc0be9961e229bab12e9d93782b0924a0f84f10ad",
+    "panel.mjs": "2715bdd5ba382c7d5e9b1b4f1257a6fb62be5159894323afa580c68dbd922a11",
+    "react.mjs": "0e826681d5e8cb6e533a4039a0205c4cc3c12a352dce012697789bb7c88e698e",
+    "styles.mjs": "8f25659f29ad2fa5f6b5e5a58f8fe8031944b3800895d2ee2f588eebaadd306a",
+    "verify.mjs": "d495c8a66f06abd695bd04550c85c27a3b7ea05932a1e950db1817cd03829eff",
+    "viewport.mjs": "fa52a6e16d0d720778732a29bc82e78ef39cc33cbdc4c2115c4217bfb06f9602"
+  }
+}
