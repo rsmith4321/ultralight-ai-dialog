@@ -221,6 +221,13 @@ test('unreceipted MarketingKit adoption requires exact clean Git source and impo
   success(adopt(original)); const receipt = verifyChat(legacy);
   assert.equal(receipt.source,'rsmith4321/ultralight-ai-dialog');
   assert.equal(receipt.commit,f.git('rev-parse','HEAD'));
+  fs.unlinkSync(path.join(f.site,'package.json'));
+  const upgrade = () => spawnSync(process.execPath,[path.join(f.source,'sync-chat.mjs'),f.site,'--destination=chat'],{encoding:'utf8',timeout:10000});
+  success(upgrade());
+  assert.equal(verifyChat(legacy).commit,f.git('rev-parse','HEAD'));
+  fs.appendFileSync(path.join(legacy,'panel.mjs'),'\n// local edit');
+  const beforeUpgrade=snapshot(legacy);
+  refused(upgrade(),/Existing chat drift/); assert.deepEqual(snapshot(legacy),beforeUpgrade);
 });
 
 test('pre-existing predictable staging directories and symlinks are untouched', async t => {

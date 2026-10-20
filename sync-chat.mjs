@@ -25,7 +25,15 @@ const source = path.join(root, 'chat');
 const record = { source: 'rsmith4321/ultralight-ai-dialog', repository: 'https://github.com/rsmith4321/ultralight-ai-dialog', version: JSON.parse(fs.readFileSync(path.join(source, 'package.json'))).version,
   commit, dirty: false, files: chatHashes(source) };
 for (const site of sites.map(value => path.resolve(value))) {
-  if (!(destination === 'chat' && adopt) && !['package.json', 'react/package.json', 'react-header/package.json'].some(file => fs.existsSync(path.join(site, file)))) throw new Error(`Not a site root: ${site}`);
+  // A migrated MarketingKit is a strict pinned consumer even though it has
+  // no npm package at its root. Its receipt and every byte are verified below
+  // before staging or replacing anything.
+  let pinnedChat = false;
+  if (destination === 'chat') {
+    try { const info = fs.lstatSync(path.join(site, 'chat', 'SOURCE.json')); pinnedChat = info.isFile() && !info.isSymbolicLink(); }
+    catch (error) { if (error.code !== 'ENOENT') throw error; }
+  }
+  if (!(destination === 'chat' && (adopt || pinnedChat)) && !['package.json', 'react/package.json', 'react-header/package.json'].some(file => fs.existsSync(path.join(site, file)))) throw new Error(`Not a site root: ${site}`);
   const target = path.join(site, destination); const parent = path.dirname(target);
   if (adopt) {
     let targetInfo;
