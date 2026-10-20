@@ -1,6 +1,6 @@
 # Ultralight AI Dialog runtime
 
-Version 0.1.6. MIT licensed. Canonical source and integration documentation:
+Version 0.1.7. MIT licensed. Canonical source and integration documentation:
 https://github.com/rsmith4321/ultralight-ai-dialog
 
 Presentation and viewport behavior only. No provider, network, authentication,
@@ -18,3 +18,14 @@ file hashes. Never edit them directly: change the canonical source, review,
 commit, and run sync-chat.mjs. Each consumer retains its own content and backend.
 Physical iOS Safari keyboard and assistive-technology testing remains a separate
 step from desktop viewport emulation.
+
+Optional contact.mjs exports createContactForm({document,onSubmit,onBack,
+onDraftChange,onStatusChange,values,limits,extraFields,initialStatus,requireName})
+and returns element/getValues/getStatus/setStatus/focus/
+destroy. It submits only name/email/message/website through your callback;
+only ok===true confirms success. Uncertain/thrown results lock sending;
+definite ok:false stays editable unless locked:true/uncertain:true. Pending,
+success and uncertain statuses always lock, while Back remains available. Keep mounted while hidden to retain drafts
+and pending receipts. No auto focus, transport, retry or transcript sharing.
+Extra verification DOM stays adapter-owned and is never serialized.
+react.mjs additionally exports ChatContactForm with live callback refs.

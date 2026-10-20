@@ -14,10 +14,15 @@
     "gzip": 4775,
     "brotli": 4085
   },
+  "optionalContact": {
+    "raw": 6213,
+    "gzip": 2426,
+    "brotli": 2065
+  },
   "optionalModalCss": {
     "raw": 4454,
     "gzip": 1167,
     "brotli": 982
   },
-  "version": "0.1.6"
+  "version": "0.1.7"
 }

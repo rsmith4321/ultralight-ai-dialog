@@ -7,7 +7,7 @@ const phoneQuery = '(max-width: 599.95px), (max-width: 1023.95px) and (max-heigh
 // authentication, history and business rules. No network or storage here.
 export function attachPanel({ panel, log, input, closeButton, launcher, onClose = () => {}, manageFocus = true }) {
   if (!document.querySelector('style[data-shared-chat-style]')) {
-    const style = document.createElement('style'); style.dataset.sharedChatStyle = '0.1.6'; style.textContent = panelCss; document.head.append(style);
+    const style = document.createElement('style'); style.dataset.sharedChatStyle = '0.1.7'; style.textContent = panelCss; document.head.append(style);
   }
   panel.dataset.chatPanel = '';
   if (log) { log.dataset.chatLog = ''; log.setAttribute('role', 'log'); log.setAttribute('aria-live', 'polite'); log.setAttribute('aria-relevant', 'additions text'); }

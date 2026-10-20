@@ -4,7 +4,7 @@ A small, provider-neutral conversation UI for websites. An on-demand launcher op
 
 The vanilla modules have no external runtime dependencies. They handle presentation, viewport sizing, and dialog behavior; your application owns requests, authentication, history, and business rules.
 
-Version 0.1.6 measures **4,775 bytes gzip** for the vanilla launcher and panel combined. The initial launcher is **1,196 bytes gzip**; the panel loads when opened.
+Version 0.1.7 measures **4,775 bytes gzip** for the vanilla launcher and panel combined. The initial launcher is **1,196 bytes gzip**; the panel loads when opened.
 
 | Bundle | Minified bytes | Gzip bytes | Brotli bytes |
 | --- | ---: | ---: | ---: |
@@ -12,7 +12,7 @@ Version 0.1.6 measures **4,775 bytes gzip** for the vanilla launcher and panel c
 | Panel, styles, and viewport behavior | 11,328 | 3,579 | 3,129 |
 | Combined | 13,846 | 4,775 | 4,085 |
 
-Measured with esbuild 0.28.1, ESM minification targeting Safari 15, and Node's default gzip and Brotli settings. The total sums separately compressed bundles. These figures exclude application content, the demo, React, and the optional React modal stylesheet. Reproduce them with `npm run size`.
+Measured with esbuild 0.28.1, ESM minification targeting Safari 15, and Node's default gzip and Brotli settings. The total sums separately compressed bundles. These figures exclude application content, the demo, React, the optional contact form, and the optional React modal stylesheet. Reproduce them with `npm run size`.
 
 ## Try it locally
 
@@ -90,6 +90,55 @@ When a host already owns focus, set `manageFocus: false`. That disables this ada
 
 For a page-wide theme, set `--kit-primary`, `--kit-on-primary`, and `--font-sans` on your root element. Set `--kit-paper`, `--kit-ink`, `--kit-line`, and `--kit-soft` for panel colors. These defaults reach both the launcher and panel. For element-specific changes, set `--chat-*` properties inline on the relevant element; the panel declares its own defaults, so root-level `--chat-*` values alone do not override them. Keep input text at 16px or larger.
 
+## Optional contact form
+
+Import `createContactForm` from `./shared/chat/contact.mjs` (package export `ultralight-ai-dialog/contact`) only where needed. Its scoped styles are included in that optional module, measured at **2,426 bytes gzip** (6,213 minified bytes; 2,065 bytes Brotli). The launcher and dialog core do not import it. Try the [local contact example](demo/contact.html); it makes no request and reports that no message was sent.
+
+```js
+import { createContactForm } from './shared/chat/contact.mjs';
+
+const contact = createContactForm({
+  document,
+  values: { name: '', email: '', message: '' },
+  limits: { name: 120, email: 200, message: 4000 },
+  onDraftChange(values) { /* Optional: persist this explicit draft in your app. */ },
+  onBack() { contact.element.hidden = true; showConversation(); },
+  async onSubmit(values) {
+    // Your adapter sends only this explicit visitor-authored message.
+    // Keep verification, transport, and server authorization in your adapter.
+    return await sendWithYourExistingTransport(values);
+  },
+});
+contentArea.append(contact.element);
+// contact.focus(); // Optional deliberate focus; mounting never takes focus.
+// contact.getValues(); // { name, email, message, website }
+// contact.destroy(); // Remove listeners and suppress detached late results.
+```
+
+`createContactForm({ document, onSubmit, onBack, onDraftChange, onStatusChange, values, limits, extraFields, initialStatus, requireName })` returns `{ element, getValues, getStatus, setStatus, focus, destroy }`. `element` is a native form with labeled, required name, email, and message fields plus a hidden-from-navigation `website` honeypot. Field limits default to 120, 200, and 4000 characters. `requireName` defaults to `true`; set it to `false` when your adapter accepts an optional name. `extraFields` accepts an optional DOM node or array of nodes for adapter-owned verification. Those nodes are never included in `getValues()` or the submit callback. Draft and submit callbacks receive exactly `{ name, email, message, website }`; no transcript is added.
+
+Only deliberate activation of **Send message** submits. Enter in a single-line field does not send. The callback may return a result or a promise. Only `{ ok: true, message: 'Your receipt' }` confirms success; the UI shows the receipt as plain text and disables fields and Send to prevent duplicate sends. Other results may provide `{ ok: false, message: 'Your explanation' }`; missing/ambiguous results and thrown exceptions show a generic uncertainty message and lock the fields and Send to avoid an accidental repeat. `{ ok: false, uncertain: true }` or `{ ok: false, locked: true }` also locks the attempt; a definite `{ ok: false }` remains editable. Draft values remain intact, and no retry happens automatically.
+
+`getStatus()` returns a copy of `{ kind, message, locked }`, where `kind` is `idle`, `pending`, `success`, `error`, or `uncertain`. `setStatus(status)` updates presentation and notifies `onStatusChange(status)`; it never submits or changes focus. `initialStatus` restores this state without emitting a new status callback. Pending, successful, and uncertain states always lock fields and Send. Terminal success/uncertainty and explicit locked outcomes remain locked for that UI instance, including after setStatus; Back stays enabled. `onStatusChange` is also called for pending and completed attempts, so your adapter can persist status with its own attempt identifiers and values. This module stores no identifiers or data. After an uncertain delivery, use the contact page to resolve it before starting another attempt.
+
+Back stays available during a pending send. Keep the form mounted and use `contact.element.hidden` when switching to the conversation so a pending result can update its own receipt without reopening anything, moving focus, or navigating. `destroy()` is idempotent; it does not cancel your adapter's transport. Your adapter remains responsible for server-side limits, validation, rate limiting, bot verification, and the meaning of its receipt.
+
+The optional React adapter exports `ChatContactForm` alongside the existing viewport hook:
+
+```jsx
+import { ChatContactForm } from './shared/chat/react.mjs';
+
+<ChatContactForm
+  ref={contactRef} // exposes getValues(), getStatus(), setStatus(), focus()
+  values={{ name: '', email: '', message: '' }}
+  onSubmit={sendWithYourExistingTransport}
+  onBack={showConversation}
+  onDraftChange={saveDraft}
+/>
+```
+
+The React wrapper mounts the same vanilla UI. Callback changes stay current without clearing the draft. `values`, `limits`, `extraFields`, `initialStatus`, and `requireName` are initial mount options; change the React key when intentionally creating a new form. Keep the wrapper mounted inside a hidden parent when switching views. Unmounting destroys the UI and suppresses late result updates. React remains optional; the vanilla contact module has no external runtime dependency.
+
 ## Keep your server and model
 
 This library does not call an AI provider. An existing Claude, OpenAI, or other server integration can keep its transport, prompts, tools, and authorization. Connect its result to your existing message renderer. Render plain text with `textContent`; sanitize any deliberately supported rich content before inserting it.
@@ -133,3 +182,7 @@ Released under the [MIT license](LICENSE).
 ## 0.1.6
 
 Wide phone windows below 1024px wide and below 500px high now retain full takeover when rotated to landscape. Tablet-sized windows at 1024px and above keep the floating public panel. The optional setup modal follows the same compact-landscape boundary. No transport or provider behavior changed.
+
+## 0.1.7
+
+Adds an optional contact form for explicit visitor-authored messages, safe receipts, pending-send protection, and Back navigation. Includes a React wrapper around the same UI. Applications retain their existing transport and verification. The contact module is measured separately and adds no code to the launcher or dialog core.

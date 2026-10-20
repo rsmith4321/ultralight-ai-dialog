@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Optional contact form example · Ultralight AI Dialog</title>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:480px;margin:30px auto;padding:0 16px}#contact{border:1px solid #ccc;border-radius:16px;overflow:hidden}</style>
+<h1>Optional contact form</h1>
+<p>This local example sends nothing. Your application supplies the real transport.</p>
+<div id="contact"></div>
+<p id="back" role="status"></p>
+<script type="module">
+import { createContactForm } from '../chat/contact.mjs';
+const ui = createContactForm({
+  onSubmit: async () => ({ ok: false, message: 'Local example only. No message was sent.' }),
+  onBack: () => { document.querySelector('#back').textContent = 'Back was selected. Your draft remains in this form.'; },
+});
+document.querySelector('#contact').append(ui.element);
+</script>
+</html>
