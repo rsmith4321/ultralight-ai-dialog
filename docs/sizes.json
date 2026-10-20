@@ -5,19 +5,19 @@
     "brotli": 956
   },
   "panel": {
-    "raw": 11325,
-    "gzip": 3574,
-    "brotli": 3118
+    "raw": 11328,
+    "gzip": 3579,
+    "brotli": 3129
   },
   "vanillaTotal": {
-    "raw": 13843,
-    "gzip": 4770,
-    "brotli": 4074
+    "raw": 13846,
+    "gzip": 4775,
+    "brotli": 4085
   },
   "optionalModalCss": {
-    "raw": 4453,
-    "gzip": 1165,
-    "brotli": 977
+    "raw": 4454,
+    "gzip": 1167,
+    "brotli": 982
   },
-  "version": "0.1.5"
+  "version": "0.1.6"
 }

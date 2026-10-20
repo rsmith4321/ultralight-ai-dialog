@@ -29,8 +29,8 @@ function fixture(t, { width = 390, height = 844, nested = false, manageFocus = t
   });
   win.scrollTo = (...args) => scrolls.push(args);
   win.matchMedia = query => {
-    assert.equal(query, '(max-width: 599.95px), (max-width: 899.95px) and (max-height: 499.95px)');
-    return { get matches() { return viewport.width < 600 || (viewport.width < 900 && viewport.height < 500); }, addEventListener() {}, removeEventListener() {} };
+    assert.equal(query, '(max-width: 599.95px), (max-width: 1023.95px) and (max-height: 499.95px)');
+    return { get matches() { return viewport.width < 600 || (viewport.width < 1024 && viewport.height < 500); }, addEventListener() {}, removeEventListener() {} };
   };
   win.requestAnimationFrame = callback => { frames.set(++nextFrame, callback); return nextFrame; };
   win.cancelAnimationFrame = id => frames.delete(id);
@@ -78,11 +78,11 @@ test('exact phone boundaries and orientation restore floating mode without movin
   const input = c.doc.querySelector('textarea'); input.focus();
   c.resize(844, 390, 'orientationchange'); assert.equal(c.panel.getAttribute('aria-modal'), 'true');
   assert.equal(c.doc.activeElement, input);
-  c.resize(900, 390); assert.equal(c.panel.getAttribute('aria-modal'), 'false');
+  c.resize(1024, 390); assert.equal(c.panel.getAttribute('aria-modal'), 'false');
   assert.equal(c.doc.activeElement, input); assert.equal(c.doc.body.style.position, '');
   assert.equal(c.doc.querySelector('#page').hasAttribute('inert'), false);
-  c.resize(899, 499); assert.equal(c.panel.getAttribute('aria-modal'), 'true');
-  c.resize(899, 500); assert.equal(c.panel.getAttribute('aria-modal'), 'false');
+  c.resize(1023, 499); assert.equal(c.panel.getAttribute('aria-modal'), 'true');
+  c.resize(1023, 500); assert.equal(c.panel.getAttribute('aria-modal'), 'false');
   c.doc.querySelector('#page a').focus(); assert.equal(c.doc.activeElement, c.doc.querySelector('#page a'));
   c.resize(1200, 900); c.ui.close();
   assert.equal(c.doc.activeElement, c.launcher); assert.equal(c.closes, 1);
@@ -161,4 +161,14 @@ test('phone with no available controls keeps Tab on the panel; desktop destroy r
   const c = fixture(t); c.panel.querySelectorAll('button,input,textarea,a').forEach(element => element.remove());
   c.ui.open(); c.panel.focus(); assert.equal(c.tab(c.panel).defaultPrevented, true); assert.equal(c.doc.activeElement, c.panel);
   c.resize(1024, 768); c.ui.destroy(); assert.equal(c.doc.activeElement, c.launcher);
+});
+
+
+test('wide phone landscape retains takeover until the tablet boundary', t => {
+  const c = fixture(t, { width: 932, height: 430 }); c.ui.open();
+  assert.equal(c.panel.getAttribute('aria-modal'), 'true');
+  assert.equal(c.doc.querySelector('#page').hasAttribute('inert'), true);
+  c.resize(956, 440); assert.equal(c.panel.getAttribute('aria-modal'), 'true');
+  c.resize(1024, 440); assert.equal(c.panel.getAttribute('aria-modal'), 'false');
+  assert.equal(c.doc.body.style.position, '');
 });

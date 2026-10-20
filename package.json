@@ -1,6 +1,6 @@
 {
   "name": "ultralight-ai-dialog",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A tiny, provider-neutral assistant dialog with phone takeover, viewport-aware composition and optional React integration.",
   "type": "module",
   "license": "MIT",

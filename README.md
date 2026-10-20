@@ -4,13 +4,13 @@ A small, provider-neutral conversation UI for websites. An on-demand launcher op
 
 The vanilla modules have no external runtime dependencies. They handle presentation, viewport sizing, and dialog behavior; your application owns requests, authentication, history, and business rules.
 
-Version 0.1.5 measures **4,770 bytes gzip** for the vanilla launcher and panel combined. The initial launcher is **1,196 bytes gzip**; the panel loads when opened.
+Version 0.1.6 measures **4,775 bytes gzip** for the vanilla launcher and panel combined. The initial launcher is **1,196 bytes gzip**; the panel loads when opened.
 
 | Bundle | Minified bytes | Gzip bytes | Brotli bytes |
 | --- | ---: | ---: | ---: |
 | Launcher | 2,518 | 1,196 | 956 |
-| Panel, styles, and viewport behavior | 11,325 | 3,574 | 3,118 |
-| Combined | 13,843 | 4,770 | 4,074 |
+| Panel, styles, and viewport behavior | 11,328 | 3,579 | 3,129 |
+| Combined | 13,846 | 4,775 | 4,085 |
 
 Measured with esbuild 0.28.1, ESM minification targeting Safari 15, and Node's default gzip and Brotli settings. The total sums separately compressed bundles. These figures exclude application content, the demo, React, and the optional React modal stylesheet. Reproduce them with `npm run size`.
 
@@ -82,7 +82,7 @@ export function createConversation(launcher) {
 | `data-chat-starters` | Optional suggested prompts |
 | `data-chat-header` | Header when not using a direct `<header>` child |
 
-On desktop, the panel floats at up to 420 CSS pixels wide and the page remains usable. At widths below 600 CSS pixels, it takes over the available viewport. Compact landscape layouts below 900 pixels wide and 500 pixels high also use the takeover layout. The phone modal behavior handles focus containment, background inertness, scroll locking, and focus restoration. Opening focuses the close control so a touch keyboard is not requested immediately.
+On desktop, the panel floats at up to 420 CSS pixels wide and the page remains usable. At widths below 600 CSS pixels, it takes over the available viewport. Compact landscape layouts below 1024 pixels wide and 500 pixels high also use the takeover layout. The phone modal behavior handles focus containment, background inertness, scroll locking, and focus restoration. Opening focuses the close control so a touch keyboard is not requested immediately.
 
 The viewport helper follows the visual viewport when available, accounting for on-screen keyboard space and safe-area insets. Browser emulation and automated checks do not establish physical iOS keyboard behavior; test your final application on the devices you support.
 
@@ -129,3 +129,7 @@ npm run size
 The size command measures the current source; consult its output for reproducible numbers. Development dependencies are not needed by a deployed vanilla consumer. See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidance.
 
 Released under the [MIT license](LICENSE).
+
+## 0.1.6
+
+Wide phone windows below 1024px wide and below 500px high now retain full takeover when rotated to landscape. Tablet-sized windows at 1024px and above keep the floating public panel. The optional setup modal follows the same compact-landscape boundary. No transport or provider behavior changed.

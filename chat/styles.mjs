@@ -32,7 +32,7 @@ export const panelCss = `
 [data-chat-panel][data-chat-tiny] [data-chat-starters]{display:none}
 [data-chat-panel][data-chat-tiny] [data-chat-note]{max-height:24px}
 [data-chat-panel][data-chat-tiny] [data-chat-check]{max-height:40px}
-@media (max-width:599.95px), (max-width:899.95px) and (max-height:499.95px){
+@media (max-width:599.95px), (max-width:1023.95px) and (max-height:499.95px){
 [data-chat-panel]{left:var(--chat-vleft,0px)!important;top:var(--chat-vtop,0px)!important;transform:none;width:var(--chat-vw,100vw);max-width:none;height:var(--chat-vh,100dvh)!important;max-height:none;border:0;border-radius:0;box-shadow:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)!important}
 [data-chat-panel] [data-chat-log]{flex:1 1 auto}
 }

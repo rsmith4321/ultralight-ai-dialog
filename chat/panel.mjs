@@ -1,13 +1,13 @@
 import { observeViewport } from './viewport.mjs';
 import { panelCss } from './styles.mjs';
 
-const phoneQuery = '(max-width: 599.95px), (max-width: 899.95px) and (max-height: 499.95px)';
+const phoneQuery = '(max-width: 599.95px), (max-width: 1023.95px) and (max-height: 499.95px)';
 
 // Presentation-only bridge. Existing DOM/React owns messages, forms, transport,
 // authentication, history and business rules. No network or storage here.
 export function attachPanel({ panel, log, input, closeButton, launcher, onClose = () => {}, manageFocus = true }) {
   if (!document.querySelector('style[data-shared-chat-style]')) {
-    const style = document.createElement('style'); style.dataset.sharedChatStyle = '0.1.5'; style.textContent = panelCss; document.head.append(style);
+    const style = document.createElement('style'); style.dataset.sharedChatStyle = '0.1.6'; style.textContent = panelCss; document.head.append(style);
   }
   panel.dataset.chatPanel = '';
   if (log) { log.dataset.chatLog = ''; log.setAttribute('role', 'log'); log.setAttribute('aria-live', 'polite'); log.setAttribute('aria-relevant', 'additions text'); }
@@ -114,7 +114,7 @@ export function attachPanel({ panel, log, input, closeButton, launcher, onClose 
   function observeResponsive() {
     const media = win.matchMedia?.(phoneQuery);
     const update = () => {
-      const phone = media ? media.matches : win.innerWidth < 600 || (win.innerWidth < 900 && win.innerHeight < 500);
+      const phone = media ? media.matches : win.innerWidth < 600 || (win.innerWidth < 1024 && win.innerHeight < 500);
       if (phone && !releaseModal) {
         releaseModal = enterModal();
         if (manageFocus && !panel.contains(doc.activeElement)) focusTarget();
