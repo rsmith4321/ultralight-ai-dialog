@@ -2,17 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 
-// React is an optional consumer peer. Exercise real React when a consumer's
-// development environment supplies it; the vanilla tests need no React install.
-let React, createRoot, ChatContactForm, act;
-try {
-  React = await import('react');
-  ({ createRoot } = await import('react-dom/client'));
-  ({ ChatContactForm } = await import('../chat/react.mjs'));
-  act = React.act || (await import('react-dom/test-utils')).act;
-} catch (error) { if (error.code !== 'ERR_MODULE_NOT_FOUND') throw error; }
+import * as React from 'react';
+import { act } from 'react';
+import { createRoot } from 'react-dom/client';
+import { ChatContactForm } from '../chat/react.mjs';
 
-test('React wrapper retains the same draft DOM and pending send while callbacks change; cleanup rejects late updates', { skip: !createRoot && 'Optional React consumer dependencies not installed' }, async t => {
+test('React wrapper retains the same draft DOM and pending send while callbacks change; cleanup rejects late updates', async t => {
   const dom = new JSDOM('<div id="host"></div>');
   const saved = new Map();
   for (const [key, value] of Object.entries({ window: dom.window, document: dom.window.document, IS_REACT_ACT_ENVIRONMENT: true })) {
