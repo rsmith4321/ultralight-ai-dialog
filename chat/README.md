@@ -1,6 +1,6 @@
 # Ultralight AI Dialog runtime
 
-Version 0.1.8. MIT licensed. Canonical source and integration documentation:
+Version 0.1.9. MIT licensed. Canonical source and integration documentation:
 https://github.com/rsmith4321/ultralight-ai-dialog
 
 Presentation and viewport behavior only. No provider, network, authentication,
@@ -12,6 +12,13 @@ lifecycle, viewport.mjs for visual viewport tracking, and modal.css for an
 existing React modal. Phones below600 CSS pixels or compact landscape below
 1024 pixels wide/500 pixels high take over the visible viewport; larger public
 chat panels float. Phone opening focuses Close and does not summon the keyboard.
+
+attachPanel accepts optional responsive: { phoneMaxWidth, landscapeMaxWidth }
+with inclusive positive safe integer CSS pixel widths. For example 760/1000
+aligns with a host's phone/tablet tiers. Omitted limits preserve defaults.
+getPanelPhoneQuery(responsive) returns the exact query for host navigation
+checks. Per-panel takeover styling and modal/focus behavior use that query
+together. The optional React modal and launcher defaults are unchanged.
 
 Generated consumer copies include SOURCE.json with an exact source commit and
 file hashes. Never edit them directly: change the canonical source, review,

@@ -1,13 +1,30 @@
 import { observeViewport } from './viewport.mjs';
 import { panelCss } from './styles.mjs';
 
-const phoneQuery = '(max-width: 599.95px), (max-width: 1023.95px) and (max-height: 499.95px)';
+function responsiveLimits(responsive = {}) {
+  if (!responsive || typeof responsive !== 'object' || Array.isArray(responsive)) throw new TypeError('responsive must be an object');
+  const limit = (name, fallback) => {
+    const value = responsive[name];
+    if (value === undefined) return fallback;
+    if (!Number.isSafeInteger(value) || value <= 0) throw new TypeError(`${name} must be a positive integer CSS pixel width`);
+    return value;
+  };
+  return { phoneMaxWidth: limit('phoneMaxWidth', 599.95), landscapeMaxWidth: limit('landscapeMaxWidth', 1023.95) };
+}
+const queryFor = ({ phoneMaxWidth, landscapeMaxWidth }) => `(max-width: ${phoneMaxWidth}px), (max-width: ${landscapeMaxWidth}px) and (max-height: 499.95px)`;
+
+// Share the exact presentation/focus boundary with a host's navigation logic.
+export function getPanelPhoneQuery(responsive) {
+  return queryFor(responsiveLimits(responsive));
+}
 
 // Presentation-only bridge. Existing DOM/React owns messages, forms, transport,
 // authentication, history and business rules. No network or storage here.
-export function attachPanel({ panel, log, input, closeButton, launcher, onClose = () => {}, manageFocus = true }) {
+export function attachPanel({ panel, log, input, closeButton, launcher, onClose = () => {}, manageFocus = true, responsive }) {
+  const limits = responsiveLimits(responsive);
+  const phoneQuery = queryFor(limits);
   if (!document.querySelector('style[data-shared-chat-style]')) {
-    const style = document.createElement('style'); style.dataset.sharedChatStyle = '0.1.8'; style.textContent = panelCss; document.head.append(style);
+    const style = document.createElement('style'); style.dataset.sharedChatStyle = '0.1.9'; style.textContent = panelCss; document.head.append(style);
   }
   panel.dataset.chatPanel = '';
   if (log) { log.dataset.chatLog = ''; log.setAttribute('role', 'log'); log.setAttribute('aria-live', 'polite'); log.setAttribute('aria-relevant', 'additions text'); }
@@ -114,7 +131,10 @@ export function attachPanel({ panel, log, input, closeButton, launcher, onClose 
   function observeResponsive() {
     const media = win.matchMedia?.(phoneQuery);
     const update = () => {
-      const phone = media ? media.matches : win.innerWidth < 600 || (win.innerWidth < 1024 && win.innerHeight < 500);
+      const phone = media ? media.matches :
+        (responsive?.phoneMaxWidth === undefined ? win.innerWidth < 600 : win.innerWidth <= limits.phoneMaxWidth) ||
+        ((responsive?.landscapeMaxWidth === undefined ? win.innerWidth < 1024 : win.innerWidth <= limits.landscapeMaxWidth) && win.innerHeight < 500);
+      panel.toggleAttribute('data-chat-phone', phone);
       if (phone && !releaseModal) {
         releaseModal = enterModal();
         if (manageFocus && !panel.contains(doc.activeElement)) focusTarget();
@@ -129,6 +149,7 @@ export function attachPanel({ panel, log, input, closeButton, launcher, onClose 
       win.removeEventListener('resize', update);
       win.removeEventListener('orientationchange', update);
       releaseModal?.(); releaseModal = null;
+      panel.removeAttribute('data-chat-phone');
     };
   }
   function open() {

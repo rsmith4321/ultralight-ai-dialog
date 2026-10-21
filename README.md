@@ -4,13 +4,13 @@ A small, provider-neutral conversation UI for websites. An on-demand launcher op
 
 The vanilla modules have no external runtime dependencies. They handle presentation, viewport sizing, and dialog behavior; your application owns requests, authentication, history, and business rules.
 
-Version 0.1.8 measures **4,775 bytes gzip** for the vanilla launcher and panel combined. The initial launcher is **1,196 bytes gzip**; the panel loads when opened.
+Version 0.1.9 measures **5,050 bytes gzip** for the vanilla launcher and panel combined. The initial launcher is **1,196 bytes gzip**; the panel loads when opened.
 
 | Bundle | Minified bytes | Gzip bytes | Brotli bytes |
 | --- | ---: | ---: | ---: |
 | Launcher | 2,518 | 1,196 | 956 |
-| Panel, styles, and viewport behavior | 11,328 | 3,579 | 3,128 |
-| Combined | 13,846 | 4,775 | 4,084 |
+| Panel, styles, and viewport behavior | 11,975 | 3,854 | 3,371 |
+| Combined | 14,493 | 5,050 | 4,327 |
 
 Measured with esbuild 0.28.1, ESM minification targeting Safari 15, and Node's default gzip and Brotli settings. The total sums separately compressed bundles. These figures exclude application content, the demo, React, the optional contact form, and the optional React modal stylesheet. Reproduce them with `npm run size`.
 
@@ -72,7 +72,7 @@ export function createConversation(launcher) {
 
 ## Behavior and markup
 
-`attachPanel({ panel, log, input, closeButton, launcher, onClose, manageFocus })` returns `open`, `close`, and `destroy`. `onClose` is optional; `manageFocus` defaults to `true`. Styles are injected when the panel module is attached. The adapter marks the panel, log, input, close button, and first form automatically. Mark message bubbles and other optional content in your own markup:
+`attachPanel({ panel, log, input, closeButton, launcher, onClose, manageFocus, responsive })` returns `open`, `close`, and `destroy`. `onClose` is optional; `manageFocus` defaults to `true`. Styles are injected when the panel module is attached. The adapter marks the panel, log, input, close button, and first form automatically. Mark message bubbles and other optional content in your own markup:
 
 | Attribute | Purpose |
 | --- | --- |
@@ -83,6 +83,19 @@ export function createConversation(launcher) {
 | `data-chat-header` | Header when not using a direct `<header>` child |
 
 On desktop, the panel floats at up to 420 CSS pixels wide and the page remains usable. At widths below 600 CSS pixels, it takes over the available viewport. Compact landscape layouts below 1024 pixels wide and 500 pixels high also use the takeover layout. The phone modal behavior handles focus containment, background inertness, scroll locking, and focus restoration. Opening focuses the close control so a touch keyboard is not requested immediately.
+
+A host may set inclusive integer layout limits independently for each vanilla panel:
+
+```js
+import { attachPanel, getPanelPhoneQuery } from './shared/chat/panel.mjs';
+
+const responsive = { phoneMaxWidth: 760, landscapeMaxWidth: 1000 };
+const ui = attachPanel({ panel, log, input, closeButton, launcher, responsive });
+// Reuse the same query for host navigation or handoff decisions.
+const takeover = matchMedia(getPanelPhoneQuery(responsive)).matches;
+```
+
+Each supplied width must be a positive safe integer in CSS pixels; invalid values throw before attaching the panel. `phoneMaxWidth` applies at all heights, while `landscapeMaxWidth` applies only below 500px high. Omitted values preserve the existing below-600px and compact-landscape below-1024px behavior. The same query controls per-panel takeover styling, background isolation, scroll locking, and focus containment; custom settings do not change other panels. The optional React modal stylesheet and launcher retain their existing breakpoints.
 
 The viewport helper follows the visual viewport when available, accounting for on-screen keyboard space and safe-area insets. Browser emulation and automated checks do not establish physical iOS keyboard behavior; test your final application on the devices you support.
 
@@ -190,3 +203,8 @@ Adds an optional contact form for explicit visitor-authored messages, safe recei
 ## 0.1.8
 
 The optional React contact wrapper now lives in `contact-react.mjs`; import `ChatContactForm` from that entry instead of `react.mjs`. The existing `react.mjs` viewport hook has no contact-module imports or re-exports, keeping contact code out of viewport-only chunks. `createContactForm` and all contact behavior are unchanged. The size command reports both optional React adapters separately, excluding the external React runtime. The viewport adapter measures 527 bytes gzip (1,236 minified bytes); the contact React adapter including the vanilla form measures 2,756 bytes gzip (7,265 minified bytes).
+
+
+## 0.1.9
+
+Vanilla panels accept optional `responsive: { phoneMaxWidth, landscapeMaxWidth }` inclusive integer limits. `getPanelPhoneQuery(responsive)` shares the exact takeover query with host adapters. Per-panel state keeps takeover CSS, modal focus behavior, and scroll locking synchronized without changing defaults or the optional React modal.

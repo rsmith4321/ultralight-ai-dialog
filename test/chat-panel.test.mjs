@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 import path from 'node:path';
-import { attachPanel } from '../chat/panel.mjs';
+import { attachPanel, getPanelPhoneQuery } from '../chat/panel.mjs';
 
 // The package has no runtime dependencies. Use an existing consumer's jsdom:
 // SHARED_CHAT_TEST_DEPENDENCIES=/path/to/consumer/react node --test test/*.test.mjs
@@ -10,7 +10,7 @@ const require = createRequire(process.env.SHARED_CHAT_TEST_DEPENDENCIES
   ? path.join(path.resolve(process.env.SHARED_CHAT_TEST_DEPENDENCIES), 'package.json') : import.meta.url);
 const { JSDOM } = require('jsdom');
 
-function fixture(t, { width = 390, height = 844, nested = false, manageFocus = true } = {}) {
+function fixture(t, { width = 390, height = 844, nested = false, manageFocus = true, responsive, noMatchMedia = false } = {}) {
   const dom = new JSDOM(`<!doctype html><html><head></head><body>
     <main id="page"><a href="/">Page</a></main><aside inert="already-inert">Prior inert</aside>
     <button id="open">Open</button>${nested ? '<div id="wrapper"><button id="sibling">Wrapper sibling</button>' : ''}
@@ -29,13 +29,15 @@ function fixture(t, { width = 390, height = 844, nested = false, manageFocus = t
   });
   win.scrollTo = (...args) => scrolls.push(args);
   win.matchMedia = query => {
-    assert.equal(query, '(max-width: 599.95px), (max-width: 1023.95px) and (max-height: 499.95px)');
-    return { get matches() { return viewport.width < 600 || (viewport.width < 1024 && viewport.height < 500); }, addEventListener() {}, removeEventListener() {} };
+    assert.equal(query, getPanelPhoneQuery(responsive));
+    const [phoneMax, landscapeMax, heightMax] = [...query.matchAll(/max-(?:width|height): ([\d.]+)px/g)].map(match => Number(match[1]));
+    return { get matches() { return viewport.width <= phoneMax || (viewport.width <= landscapeMax && viewport.height <= heightMax); }, addEventListener() {}, removeEventListener() {} };
   };
+  if (noMatchMedia) delete win.matchMedia;
   win.requestAnimationFrame = callback => { frames.set(++nextFrame, callback); return nextFrame; };
   win.cancelAnimationFrame = id => frames.delete(id);
   const panel = doc.querySelector('#panel'), launcher = doc.querySelector('#open'), close = doc.querySelector('#close');
-  const ui = attachPanel({ panel, launcher, closeButton: close, log: doc.querySelector('#log'), input: doc.querySelector('textarea'), manageFocus, onClose: () => closes++ });
+  const ui = attachPanel({ panel, launcher, closeButton: close, log: doc.querySelector('#log'), input: doc.querySelector('textarea'), manageFocus, responsive, onClose: () => closes++ });
   launcher.focus();
   t.after(() => { ui.destroy(); dom.window.close(); delete globalThis.window; delete globalThis.document; });
   return { doc, win, ui, panel, launcher, close, scrolls, get closes() { return closes; },
@@ -171,4 +173,73 @@ test('wide phone landscape retains takeover until the tablet boundary', t => {
   c.resize(956, 440); assert.equal(c.panel.getAttribute('aria-modal'), 'true');
   c.resize(1024, 440); assert.equal(c.panel.getAttribute('aria-modal'), 'false');
   assert.equal(c.doc.body.style.position, '');
+});
+
+const siteResponsive = { phoneMaxWidth: 760, landscapeMaxWidth: 1000 };
+
+test('custom phone and landscape limits keep presentation, modal focus, and scroll locks together', t => {
+  const c = fixture(t, { width: 760, height: 800, responsive: siteResponsive }); c.ui.open();
+  assert.equal(c.panel.hasAttribute('data-chat-phone'), true);
+  assert.equal(c.panel.getAttribute('aria-modal'), 'true');
+  assert.equal(c.doc.body.style.position, 'fixed');
+  assert.equal(c.tab(c.doc.querySelector('#last')).defaultPrevented, true);
+  const input = c.doc.querySelector('textarea'); input.focus();
+  c.resize(761, 800);
+  assert.equal(c.panel.hasAttribute('data-chat-phone'), false);
+  assert.equal(c.panel.getAttribute('aria-modal'), 'false');
+  assert.equal(c.doc.body.style.position, '');
+  assert.equal(c.doc.activeElement, input);
+  assert.equal(c.tab(c.doc.querySelector('#last')).defaultPrevented, false);
+  c.resize(1000, 499);
+  assert.equal(c.panel.hasAttribute('data-chat-phone'), true);
+  assert.equal(c.panel.getAttribute('aria-modal'), 'true');
+  c.resize(1001, 499);
+  assert.equal(c.panel.hasAttribute('data-chat-phone'), false);
+  assert.equal(c.panel.getAttribute('aria-modal'), 'false');
+  c.resize(1000, 500);
+  assert.equal(c.panel.hasAttribute('data-chat-phone'), false);
+  c.resize(760, 800); c.ui.close();
+  assert.equal(c.panel.hasAttribute('data-chat-phone'), false);
+  assert.equal(c.doc.activeElement, c.launcher);
+});
+
+test('custom responsive fallback works without matchMedia and preserves host focus ownership', t => {
+  const c = fixture(t, { width: 760, height: 800, responsive: siteResponsive, noMatchMedia: true, manageFocus: false });
+  c.ui.open();
+  assert.equal(c.panel.hasAttribute('data-chat-phone'), true);
+  assert.equal(c.panel.getAttribute('aria-modal'), 'true');
+  assert.equal(c.doc.activeElement, c.launcher);
+  c.resize(761, 800);
+  assert.equal(c.panel.hasAttribute('data-chat-phone'), false);
+  assert.equal(c.panel.getAttribute('aria-modal'), 'false');
+  c.resize(1000, 499);
+  assert.equal(c.panel.getAttribute('aria-modal'), 'true');
+  c.resize(1001, 499);
+  assert.equal(c.panel.getAttribute('aria-modal'), 'false');
+});
+
+test('custom and default panels choose independent presentation in the same document', t => {
+  const c = fixture(t, { width: 700, height: 800, responsive: siteResponsive });
+  const other = c.doc.createElement('section'); other.hidden = true; c.doc.body.append(other);
+  // Exercise the other query without opening simultaneous modal managers.
+  c.win.matchMedia = query => ({ matches: query === getPanelPhoneQuery(siteResponsive), addEventListener() {}, removeEventListener() {} });
+  const defaults = attachPanel({ panel: other, manageFocus: false });
+  t.after(() => defaults.destroy());
+  defaults.open();
+  assert.equal(other.hasAttribute('data-chat-phone'), false);
+  defaults.close(); c.ui.open();
+  assert.equal(c.panel.hasAttribute('data-chat-phone'), true);
+  assert.equal(other.hasAttribute('data-chat-phone'), false);
+  const styles = c.doc.querySelector('style[data-shared-chat-style]').textContent;
+  assert.match(styles, /\[data-chat-panel\]\[data-chat-phone\]\{/);
+  assert.doesNotMatch(styles, /@media \(max-width:/);
+});
+
+test('responsive query retains defaults and rejects invalid custom widths before touching DOM', () => {
+  assert.equal(getPanelPhoneQuery(), '(max-width: 599.95px), (max-width: 1023.95px) and (max-height: 499.95px)');
+  assert.equal(getPanelPhoneQuery(siteResponsive), '(max-width: 760px), (max-width: 1000px) and (max-height: 499.95px)');
+  for (const responsive of [null, [], '760', { phoneMaxWidth: '760' }, { phoneMaxWidth: 760.5 }, { phoneMaxWidth: 0 }, { landscapeMaxWidth: -1 }, { landscapeMaxWidth: Infinity }, { phoneMaxWidth: Number.MAX_SAFE_INTEGER + 1 }]) {
+    assert.throws(() => getPanelPhoneQuery(responsive), TypeError);
+    assert.throws(() => attachPanel({ panel: null, responsive }), TypeError);
+  }
 });
