@@ -82,20 +82,20 @@ export function createConversation(launcher) {
 | `data-chat-starters` | Optional suggested prompts |
 | `data-chat-header` | Header when not using a direct `<header>` child |
 
-On desktop, the panel floats at up to 420 CSS pixels wide and the page remains usable. At widths below 600 CSS pixels, it takes over the available viewport. Compact landscape layouts below 1024 pixels wide and 500 pixels high also use the takeover layout. The phone modal behavior handles focus containment, background inertness, scroll locking, and focus restoration. Opening focuses the close control so a touch keyboard is not requested immediately.
+On desktop, the panel floats at up to 420 CSS pixels wide and the page remains usable. At widths up to 640 CSS pixels (the phone tier), it takes over the available viewport. Compact landscape layouts up to 1024 pixels wide and below 500 pixels high also use the takeover layout. The phone modal behavior handles focus containment, background inertness, scroll locking, and focus restoration. Opening focuses the close control so a touch keyboard is not requested immediately.
 
 A host may set inclusive integer layout limits independently for each vanilla panel:
 
 ```js
 import { attachPanel, getPanelPhoneQuery } from './shared/chat/panel.mjs';
 
-const responsive = { phoneMaxWidth: 760, landscapeMaxWidth: 1000 };
+const responsive = { phoneMaxWidth: 640, landscapeMaxWidth: 1024 };
 const ui = attachPanel({ panel, log, input, closeButton, launcher, responsive });
 // Reuse the same query for host navigation or handoff decisions.
 const takeover = matchMedia(getPanelPhoneQuery(responsive)).matches;
 ```
 
-Each supplied width must be a positive safe integer in CSS pixels; invalid values throw before attaching the panel. `phoneMaxWidth` applies at all heights, while `landscapeMaxWidth` applies only below 500px high. Omitted values preserve the existing below-600px and compact-landscape below-1024px behavior. The same query controls per-panel takeover styling, background isolation, scroll locking, and focus containment; custom settings do not change other panels. The optional React modal stylesheet and launcher retain their existing breakpoints.
+Each supplied width must be a positive safe integer in CSS pixels; invalid values throw before attaching the panel. `phoneMaxWidth` applies at all heights, while `landscapeMaxWidth` applies only below 500px high. Omitted values use the default phone tier (up to 640px) and compact landscape (up to 1024px wide). The same query controls per-panel takeover styling, background isolation, scroll locking, and focus containment; custom settings do not change other panels. The optional React modal stylesheet uses the same 640/1024 tiers.
 
 The viewport helper follows the visual viewport when available, accounting for on-screen keyboard space and safe-area insets. Browser emulation and automated checks do not establish physical iOS keyboard behavior; test your final application on the devices you support.
 
@@ -208,3 +208,7 @@ The optional React contact wrapper now lives in `contact-react.mjs`; import `Cha
 ## 0.1.9
 
 Vanilla panels accept optional `responsive: { phoneMaxWidth, landscapeMaxWidth }` inclusive integer limits. `getPanelPhoneQuery(responsive)` shares the exact takeover query with host adapters. Per-panel state keeps takeover CSS, modal focus behavior, and scroll locking synchronized without changing defaults or the optional React modal.
+
+## 0.1.10
+
+Default widths follow three layout tiers: phone up to 640px, tablet 641-1024px, desktop above. Panels take over the viewport up to 640px wide (was below 600px) and in compact landscape up to 1024px wide and below 500px high (was below 1024px). The optional React modal uses the same boundaries, and its setup layout is a centered dialog at every width from 641px (it previously floated again at 1400px and above). Hosts that pass `responsive` limits are unchanged.

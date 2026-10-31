@@ -9,7 +9,7 @@ function responsiveLimits(responsive = {}) {
     if (!Number.isSafeInteger(value) || value <= 0) throw new TypeError(`${name} must be a positive integer CSS pixel width`);
     return value;
   };
-  return { phoneMaxWidth: limit('phoneMaxWidth', 599.95), landscapeMaxWidth: limit('landscapeMaxWidth', 1023.95) };
+  return { phoneMaxWidth: limit('phoneMaxWidth', 640.98), landscapeMaxWidth: limit('landscapeMaxWidth', 1024.98) };
 }
 const queryFor = ({ phoneMaxWidth, landscapeMaxWidth }) => `(max-width: ${phoneMaxWidth}px), (max-width: ${landscapeMaxWidth}px) and (max-height: 499.95px)`;
 
@@ -24,7 +24,7 @@ export function attachPanel({ panel, log, input, closeButton, launcher, onClose 
   const limits = responsiveLimits(responsive);
   const phoneQuery = queryFor(limits);
   if (!document.querySelector('style[data-shared-chat-style]')) {
-    const style = document.createElement('style'); style.dataset.sharedChatStyle = '0.1.9'; style.textContent = panelCss; document.head.append(style);
+    const style = document.createElement('style'); style.dataset.sharedChatStyle = '0.1.10'; style.textContent = panelCss; document.head.append(style);
   }
   panel.dataset.chatPanel = '';
   if (log) { log.dataset.chatLog = ''; log.setAttribute('role', 'log'); log.setAttribute('aria-live', 'polite'); log.setAttribute('aria-relevant', 'additions text'); }
@@ -132,8 +132,8 @@ export function attachPanel({ panel, log, input, closeButton, launcher, onClose 
     const media = win.matchMedia?.(phoneQuery);
     const update = () => {
       const phone = media ? media.matches :
-        (responsive?.phoneMaxWidth === undefined ? win.innerWidth < 600 : win.innerWidth <= limits.phoneMaxWidth) ||
-        ((responsive?.landscapeMaxWidth === undefined ? win.innerWidth < 1024 : win.innerWidth <= limits.landscapeMaxWidth) && win.innerHeight < 500);
+        (responsive?.phoneMaxWidth === undefined ? win.innerWidth < 641 : win.innerWidth <= limits.phoneMaxWidth) ||
+        ((responsive?.landscapeMaxWidth === undefined ? win.innerWidth < 1025 : win.innerWidth <= limits.landscapeMaxWidth) && win.innerHeight < 500);
       panel.toggleAttribute('data-chat-phone', phone);
       if (phone && !releaseModal) {
         releaseModal = enterModal();

@@ -1,6 +1,6 @@
 # Ultralight AI Dialog runtime
 
-Version 0.1.9. MIT licensed. Canonical source and integration documentation:
+Version 0.1.10. MIT licensed. Canonical source and integration documentation:
 https://github.com/rsmith4321/ultralight-ai-dialog
 
 Presentation and viewport behavior only. No provider, network, authentication,
@@ -9,12 +9,12 @@ The optional React viewport hook leaves modal focus ownership with the host.
 
 Use launcher.mjs for a deliberately opened lazy panel, panel.mjs for vanilla
 lifecycle, viewport.mjs for visual viewport tracking, and modal.css for an
-existing React modal. Phones below600 CSS pixels or compact landscape below
-1024 pixels wide/500 pixels high take over the visible viewport; larger public
+existing React modal. Phones up to 640 CSS pixels or compact landscape up to
+1024 pixels wide and below 500 pixels high take over the visible viewport; larger public
 chat panels float. Phone opening focuses Close and does not summon the keyboard.
 
 attachPanel accepts optional responsive: { phoneMaxWidth, landscapeMaxWidth }
-with inclusive positive safe integer CSS pixel widths. For example 760/1000
+with inclusive positive safe integer CSS pixel widths. For example 640/1024
 aligns with a host's phone/tablet tiers. Omitted limits preserve defaults.
 getPanelPhoneQuery(responsive) returns the exact query for host navigation
 checks. Per-panel takeover styling and modal/focus behavior use that query

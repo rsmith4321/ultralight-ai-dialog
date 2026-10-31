@@ -73,18 +73,18 @@ test('phone takeover traps Tab/Shift+Tab, isolates the page and avoids input aut
 });
 
 test('exact phone boundaries and orientation restore floating mode without moving in-panel focus', t => {
-  const c = fixture(t, { width: 600, height: 800 }); c.ui.open();
+  const c = fixture(t, { width: 641, height: 800 }); c.ui.open();
   assert.equal(c.panel.getAttribute('aria-modal'), 'false');
   assert.equal(c.tab(c.doc.querySelector('#last')).defaultPrevented, false);
-  c.resize(599, 800); assert.equal(c.panel.getAttribute('aria-modal'), 'true');
+  c.resize(640, 800); assert.equal(c.panel.getAttribute('aria-modal'), 'true');
   const input = c.doc.querySelector('textarea'); input.focus();
   c.resize(844, 390, 'orientationchange'); assert.equal(c.panel.getAttribute('aria-modal'), 'true');
   assert.equal(c.doc.activeElement, input);
-  c.resize(1024, 390); assert.equal(c.panel.getAttribute('aria-modal'), 'false');
+  c.resize(1025, 390); assert.equal(c.panel.getAttribute('aria-modal'), 'false');
   assert.equal(c.doc.activeElement, input); assert.equal(c.doc.body.style.position, '');
   assert.equal(c.doc.querySelector('#page').hasAttribute('inert'), false);
-  c.resize(1023, 499); assert.equal(c.panel.getAttribute('aria-modal'), 'true');
-  c.resize(1023, 500); assert.equal(c.panel.getAttribute('aria-modal'), 'false');
+  c.resize(1024, 499); assert.equal(c.panel.getAttribute('aria-modal'), 'true');
+  c.resize(1024, 500); assert.equal(c.panel.getAttribute('aria-modal'), 'false');
   c.doc.querySelector('#page a').focus(); assert.equal(c.doc.activeElement, c.doc.querySelector('#page a'));
   c.resize(1200, 900); c.ui.close();
   assert.equal(c.doc.activeElement, c.launcher); assert.equal(c.closes, 1);
@@ -171,7 +171,7 @@ test('wide phone landscape retains takeover until the tablet boundary', t => {
   assert.equal(c.panel.getAttribute('aria-modal'), 'true');
   assert.equal(c.doc.querySelector('#page').hasAttribute('inert'), true);
   c.resize(956, 440); assert.equal(c.panel.getAttribute('aria-modal'), 'true');
-  c.resize(1024, 440); assert.equal(c.panel.getAttribute('aria-modal'), 'false');
+  c.resize(1025, 440); assert.equal(c.panel.getAttribute('aria-modal'), 'false');
   assert.equal(c.doc.body.style.position, '');
 });
 
@@ -236,7 +236,7 @@ test('custom and default panels choose independent presentation in the same docu
 });
 
 test('responsive query retains defaults and rejects invalid custom widths before touching DOM', () => {
-  assert.equal(getPanelPhoneQuery(), '(max-width: 599.95px), (max-width: 1023.95px) and (max-height: 499.95px)');
+  assert.equal(getPanelPhoneQuery(), '(max-width: 640.98px), (max-width: 1024.98px) and (max-height: 499.95px)');
   assert.equal(getPanelPhoneQuery(siteResponsive), '(max-width: 760px), (max-width: 1000px) and (max-height: 499.95px)');
   for (const responsive of [null, [], '760', { phoneMaxWidth: '760' }, { phoneMaxWidth: 760.5 }, { phoneMaxWidth: 0 }, { landscapeMaxWidth: -1 }, { landscapeMaxWidth: Infinity }, { phoneMaxWidth: Number.MAX_SAFE_INTEGER + 1 }]) {
     assert.throws(() => getPanelPhoneQuery(responsive), TypeError);
