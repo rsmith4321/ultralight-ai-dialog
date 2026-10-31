@@ -212,3 +212,7 @@ Vanilla panels accept optional `responsive: { phoneMaxWidth, landscapeMaxWidth }
 ## 0.1.10
 
 Default widths follow three layout tiers: phone up to 640px, tablet 641-1024px, desktop above. Panels take over the viewport up to 640px wide (was below 600px) and in compact landscape up to 1024px wide and below 500px high (was below 1024px). The optional React modal uses the same boundaries, and its setup layout is a centered dialog at every width from 641px (it previously floated again at 1400px and above). Hosts that pass `responsive` limits are unchanged.
+
+## 0.1.11
+
+The default queries use whole-pixel tier edges (`max-width: 640px`, `max-width: 1024px`), so hosts that allow only exact 640/1024 width queries accept the pinned stylesheet unchanged. Behavior matches 0.1.10.

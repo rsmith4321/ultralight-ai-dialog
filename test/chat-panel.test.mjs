@@ -236,7 +236,7 @@ test('custom and default panels choose independent presentation in the same docu
 });
 
 test('responsive query retains defaults and rejects invalid custom widths before touching DOM', () => {
-  assert.equal(getPanelPhoneQuery(), '(max-width: 640.98px), (max-width: 1024.98px) and (max-height: 499.95px)');
+  assert.equal(getPanelPhoneQuery(), '(max-width: 640px), (max-width: 1024px) and (max-height: 499.95px)');
   assert.equal(getPanelPhoneQuery(siteResponsive), '(max-width: 760px), (max-width: 1000px) and (max-height: 499.95px)');
   for (const responsive of [null, [], '760', { phoneMaxWidth: '760' }, { phoneMaxWidth: 760.5 }, { phoneMaxWidth: 0 }, { landscapeMaxWidth: -1 }, { landscapeMaxWidth: Infinity }, { phoneMaxWidth: Number.MAX_SAFE_INTEGER + 1 }]) {
     assert.throws(() => getPanelPhoneQuery(responsive), TypeError);

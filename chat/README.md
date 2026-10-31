@@ -1,6 +1,6 @@
 # Ultralight AI Dialog runtime
 
-Version 0.1.10. MIT licensed. Canonical source and integration documentation:
+Version 0.1.11. MIT licensed. Canonical source and integration documentation:
 https://github.com/rsmith4321/ultralight-ai-dialog
 
 Presentation and viewport behavior only. No provider, network, authentication,

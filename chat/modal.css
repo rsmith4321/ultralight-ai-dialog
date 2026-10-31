@@ -32,7 +32,7 @@
 [data-shared-chat] .sc-bd-assistant__log { flex: 1; min-height: 0; max-height: none; overflow: auto; }
 [data-shared-chat] .sc-bd-assistant__composer { flex-shrink: 0; }
 [data-shared-chat] .sc-bd-assistant__input { font-size: 16px; min-height: 44px; max-height: 96px; resize: none; }
-@media (max-width: 640.98px) {
+@media (max-width: 640px) {
   [data-shared-chat][data-shared-chat] {
     top: auto;
     left: calc(var(--chat-vleft, 0px) + var(--sc-chat-left));
@@ -67,7 +67,7 @@
     max-height: none;
   }
 }
-@media (max-width: 640.98px), (max-width: 1024.98px) and (max-height: 499.95px) {
+@media (max-width: 640px), (max-width: 1024px) and (max-height: 499.95px) {
   [data-shared-chat][data-chat-layout="setup"] {
     left: var(--chat-vleft, 0px);
     bottom: var(--chat-vbottom, 0px);
